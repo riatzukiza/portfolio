@@ -1,0 +1,59 @@
+(namespace crash-landed)
+
+(include "kit/header" )
+(import-namespace kit)
+
+(include "kit-interface/header" )
+(import-namespace interface)
+
+(include "../../../inc/rand.sibilant")
+(include "../../../inc/misc.sibilant")
+(include "../../../inc/docs.sibilant")
+(import-namespace docs)
+
+(set global 'mixin mixin 'create create)
+
+(require! (lit game active-game-systems ) "@crash-landed/game.js")
+(require! (lit start-interface) "@crash-landed/dom.js"
+          (lit Position) "@shared/systems/position.js"
+          (lit Sight) "@crash-landed/systems/sight.js"
+          (lit  player) "@crash-landed/units.js"
+          (lit get-cardinal-direction-name) "@crash-landed/directions.js"
+          (lit generate-main-road) "@crash-landed/world-gen.js"
+          (lit tiles) "@crash-landed/tiles.js"
+          (lit Path-finding) "@crash-landed/systems/path-finding.js"
+          (lit Velocity) "@shared/systems/velocity.js"
+          noise "@shared/noise.js"
+          config "@crash-landed/config.js")
+
+(const p player)
+(const v p.velocity.vector)
+
+(const game-scale config.game-scale)
+(assign p.physics.scale config.game-scale)
+(set p.physics 'forces [])
+
+(assign game.tiles tiles)
+(assign Path-finding.tiles tiles)
+
+(assign Velocity.real-time? false)
+(assign Position.wraps? false)
+
+
+(Sight.register-tile-graph tiles)
+(.select-sequence p.sprite "east")
+;; (generate-main-road)
+
+(.start game)
+
+(on game.events 'tick (t)
+
+    ;; (const pos p.pos)
+    (if (= (mod t 10) 0) (.step p.sprite))
+    (const direction-name (get-cardinal-direction-name v))
+    (.select-sequence p.sprite direction-name)
+    )
+
+
+(start-interface)
+
